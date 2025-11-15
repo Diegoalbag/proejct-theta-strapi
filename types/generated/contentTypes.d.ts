@@ -421,6 +421,7 @@ export interface ApiThemeTheme extends Struct.SingleTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    Sections: Schema.Attribute.Component<'references.section-reference', true>;
     ThemeId: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
