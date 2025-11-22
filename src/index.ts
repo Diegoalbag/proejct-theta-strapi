@@ -1,4 +1,4 @@
-// import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
 
 export default {
   /**
@@ -7,7 +7,20 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Ensure the adaptive-setting plugin's custom field is registered early
+    // This is a workaround to ensure the field is available before schemas are loaded
+    // try {
+    //   const plugin = strapi.plugin('adaptive-setting');
+    //   if (plugin) {
+    //     console.log('[Main App] Adaptive-setting plugin found');
+    //   } else {
+    //     console.log('[Main App] WARNING: Adaptive-setting plugin not found');
+    //   }
+    // } catch (error) {
+    //   console.log('[Main App] Error accessing plugin:', error);
+    // }
+  },
 
   /**
    * An asynchronous bootstrap function that runs before

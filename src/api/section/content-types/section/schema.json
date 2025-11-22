@@ -21,6 +21,11 @@
     },
     "Blocks": {
       "type": "json"
+    },
+    "settingField": {
+      "type": "component",
+      "component": "settings.setting-field",
+      "repeatable": true
     }
   }
 }

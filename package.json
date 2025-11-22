@@ -26,7 +26,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "adaptive-value-field": "file:./src/plugins/adaptive-value-field"
   },
   "devDependencies": {
     "@types/node": "^20",
