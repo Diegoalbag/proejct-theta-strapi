@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_test_section_instances",
+  "info": {
+    "displayName": "SectionInstance"
+  },
+  "options": {},
+  "attributes": {
+    "order": {
+      "type": "integer"
+    },
+    "data": {
+      "type": "json"
+    },
+    "sectionKey": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

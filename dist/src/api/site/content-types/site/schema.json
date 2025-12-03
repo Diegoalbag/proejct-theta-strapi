@@ -1,0 +1,23 @@
+{
+    "kind": "singleType",
+    "collectionName": "sites",
+    "info": {
+        "singularName": "site",
+        "pluralName": "sites",
+        "displayName": "Site"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string"
+        },
+        "homepage": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::page.page"
+        }
+    }
+}

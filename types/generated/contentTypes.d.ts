@@ -430,43 +430,39 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiSectionSection extends Struct.CollectionTypeSchema {
-  collectionName: 'sections';
+export interface ApiPagePage extends Struct.CollectionTypeSchema {
+  collectionName: 'pages';
   info: {
-    displayName: 'Section';
-    pluralName: 'sections';
-    singularName: 'section';
+    displayName: 'Page';
+    pluralName: 'pages';
+    singularName: 'page';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    Blocks: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::section.section'
-    > &
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
-    Name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    settingField: Schema.Attribute.Component<'settings.setting-field', true>;
-    Settings: Schema.Attribute.JSON & Schema.Attribute.Required;
+    sections: Schema.Attribute.Component<'test.section-instance', true>;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
   };
 }
 
-export interface ApiThemeTheme extends Struct.SingleTypeSchema {
-  collectionName: 'themes';
+export interface ApiSiteSite extends Struct.SingleTypeSchema {
+  collectionName: 'sites';
   info: {
-    displayName: 'Theme';
-    pluralName: 'themes';
-    singularName: 'theme';
+    displayName: 'Site';
+    pluralName: 'sites';
+    singularName: 'site';
   };
   options: {
     draftAndPublish: true;
@@ -475,14 +471,12 @@ export interface ApiThemeTheme extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    homepage: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'> &
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::site.site'> &
       Schema.Attribute.Private;
+    name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    Sections: Schema.Attribute.Component<'references.section-reference', true>;
-    ThemeId: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -999,8 +993,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::section.section': ApiSectionSection;
-      'api::theme.theme': ApiThemeTheme;
+      'api::page.page': ApiPagePage;
+      'api::site.site': ApiSiteSite;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
