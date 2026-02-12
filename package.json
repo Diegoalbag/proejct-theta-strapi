@@ -20,14 +20,14 @@
     "@strapi/plugin-graphql": "^5.18.0",
     "@strapi/plugin-users-permissions": "5.31.0",
     "@strapi/strapi": "5.31.0",
+    "adaptive-value-field": "file:./src/plugins/adaptive-value-field",
     "fs-extra": "^10.0.0",
     "mime-types": "^2.1.27",
     "pg": "8.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0",
-    "adaptive-value-field": "file:./src/plugins/adaptive-value-field"
+    "styled-components": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

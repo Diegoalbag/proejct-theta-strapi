@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_test_block_instances",
+  "info": {
+    "displayName": "BlockInstance"
+  },
+  "options": {},
+  "attributes": {
+    "blockType": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "data": {
+      "type": "json"
+    }
+  },
+  "config": {}
+}

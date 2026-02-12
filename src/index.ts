@@ -20,6 +20,9 @@ export default {
     // } catch (error) {
     //   console.log('[Main App] Error accessing plugin:', error);
     // }
+    // #region agent log
+    fetch('http://127.0.0.1:7254/ingest/9bc2dd47-1b5d-4b07-87e2-58585f12464c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/index.ts',message:'register end',data:{},timestamp:Date.now(),hypothesisId:'H2',runId:'post-fix'})}).catch(()=>{});
+    // #endregion
   },
 
   /**

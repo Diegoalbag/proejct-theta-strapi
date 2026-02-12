@@ -50,11 +50,16 @@ export default ({ env }) => {
     },
   };
 
+  const timeout = env.int('DATABASE_CONNECTION_TIMEOUT', 60000);
+  // #region agent log
+  fetch('http://127.0.0.1:7254/ingest/9bc2dd47-1b5d-4b07-87e2-58585f12464c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'config/database.ts',message:'database config returned',data:{client,useLocalDb,host:connections[client]?.connection?.host,port:connections[client]?.connection?.port,acquireConnectionTimeout:timeout},timestamp:Date.now(),hypothesisId:'H1',runId:'post-fix'})}).catch(()=>{});
+  // #endregion
+
   return {
     connection: {
       client,
       ...connections[client],
-      acquireConnectionTimeout: env.int('DATABASE_CONNECTION_TIMEOUT', 60000),
+      acquireConnectionTimeout: timeout,
     },
   };
 };

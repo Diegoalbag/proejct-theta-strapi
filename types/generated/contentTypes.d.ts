@@ -483,6 +483,61 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
+  collectionName: 'themes';
+  info: {
+    displayName: 'Theme';
+    pluralName: 'themes';
+    singularName: 'theme';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.String;
+    builtAssetUrl: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    deploymentStatus: Schema.Attribute.Enumeration<
+      ['pending', 'building', 'ready', 'error']
+    >;
+    deploymentUrl: Schema.Attribute.String;
+    description: Schema.Attribute.Text;
+    githubBranch: Schema.Attribute.String;
+    githubBuildBranch: Schema.Attribute.String;
+    githubOwner: Schema.Attribute.String;
+    githubRepoId: Schema.Attribute.String;
+    githubRepoName: Schema.Attribute.String;
+    githubRepoUrl: Schema.Attribute.String;
+    installedAt: Schema.Attribute.DateTime;
+    isActive: Schema.Attribute.Boolean;
+    lastBuildCommit: Schema.Attribute.String;
+    lastDeployedAt: Schema.Attribute.DateTime;
+    lastSyncAt: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'> &
+      Schema.Attribute.Private;
+    manifestUrl: Schema.Attribute.String;
+    name: Schema.Attribute.String;
+    previewImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    sectionsManifest: Schema.Attribute.JSON;
+    subdomain: Schema.Attribute.String;
+    theme_status: Schema.Attribute.Enumeration<
+      ['active', 'installed', 'updating', 'error']
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    vercelProjectId: Schema.Attribute.String;
+    version: Schema.Attribute.String;
+    webhookId: Schema.Attribute.String;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -995,6 +1050,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::page.page': ApiPagePage;
       'api::site.site': ApiSiteSite;
+      'api::theme.theme': ApiThemeTheme;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

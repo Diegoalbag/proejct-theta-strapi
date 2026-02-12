@@ -13,6 +13,11 @@
     },
     "sectionKey": {
       "type": "string"
+    },
+    "blocks": {
+      "type": "component",
+      "component": "test.block-instance",
+      "repeatable": true
     }
   },
   "config": {}

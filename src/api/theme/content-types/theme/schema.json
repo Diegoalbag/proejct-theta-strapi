@@ -1,0 +1,109 @@
+{
+  "kind": "collectionType",
+  "collectionName": "themes",
+  "info": {
+    "singularName": "theme",
+    "pluralName": "themes",
+    "displayName": "Theme"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "version": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "githubRepoUrl": {
+      "type": "string"
+    },
+    "githubRepoId": {
+      "type": "string"
+    },
+    "githubOwner": {
+      "type": "string"
+    },
+    "githubRepoName": {
+      "type": "string"
+    },
+    "builtAssetUrl": {
+      "type": "string"
+    },
+    "manifestUrl": {
+      "type": "string"
+    },
+    "theme_status": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "installed",
+        "updating",
+        "error"
+      ]
+    },
+    "previewImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "isActive": {
+      "type": "boolean"
+    },
+    "installedAt": {
+      "type": "datetime"
+    },
+    "lastSyncAt": {
+      "type": "datetime"
+    },
+    "lastBuildCommit": {
+      "type": "string"
+    },
+    "webhookId": {
+      "type": "string"
+    },
+    "sectionsManifest": {
+      "type": "json"
+    },
+    "vercelProjectId": {
+      "type": "string"
+    },
+    "deploymentUrl": {
+      "type": "string"
+    },
+    "subdomain": {
+      "type": "string"
+    },
+    "deploymentStatus": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "building",
+        "ready",
+        "error"
+      ]
+    },
+    "lastDeployedAt": {
+      "type": "datetime"
+    },
+    "githubBranch": {
+      "type": "string"
+    },
+    "githubBuildBranch": {
+      "type": "string"
+    }
+  }
+}
