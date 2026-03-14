@@ -8,9 +8,6 @@ exports.default = {
      * This gives you an opportunity to extend code.
      */
     register({ strapi }) {
-        // #region agent log
-        fetch('http://127.0.0.1:7254/ingest/9bc2dd47-1b5d-4b07-87e2-58585f12464c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'src/index.ts', message: 'register start', data: {}, timestamp: Date.now(), hypothesisId: 'H2', runId: 'post-fix' }) }).catch(() => { });
-        // #endregion
         // Ensure the adaptive-setting plugin's custom field is registered early
         // This is a workaround to ensure the field is available before schemas are loaded
         // try {
