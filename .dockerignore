@@ -1,0 +1,15 @@
+node_modules
+.tmp
+dist
+build
+.strapi
+data
+database
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.yarn
+README.md
+*.log
