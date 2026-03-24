@@ -1,0 +1,27 @@
+{
+    "kind": "collectionType",
+    "collectionName": "metaobject_entries",
+    "info": {
+        "singularName": "metaobject-entry",
+        "pluralName": "metaobject-entries",
+        "displayName": "MetaobjectEntry"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string"
+        },
+        "metaobject_definition": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::metaobject-definition.metaobject-definition",
+            "inversedBy": "metaobject_entries"
+        },
+        "data": {
+            "type": "json"
+        }
+    }
+}

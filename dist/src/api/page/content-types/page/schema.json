@@ -18,10 +18,16 @@
             "type": "uid",
             "targetField": "title"
         },
-        "sections": {
-            "type": "component",
-            "component": "test.section-instance",
-            "repeatable": true
+        "page_template": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::page-template.page-template"
+        },
+        "isHomepage": {
+            "type": "boolean"
+        },
+        "metafields": {
+            "type": "json"
         }
     }
 }

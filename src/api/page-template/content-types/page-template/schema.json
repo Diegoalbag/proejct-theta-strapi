@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "page_templates",
+  "info": {
+    "singularName": "page-template",
+    "pluralName": "page-templates",
+    "displayName": "Page Template"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "key": {
+      "type": "uid",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "previewImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "sections": {
+      "type": "component",
+      "component": "test.section-instance",
+      "repeatable": true
+    },
+    "isDefault": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+    "kind": "collectionType",
+    "collectionName": "metaobject_definitions",
+    "info": {
+        "singularName": "metaobject-definition",
+        "pluralName": "metaobject-definitions",
+        "displayName": "MetaobjectDefinition"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string"
+        },
+        "key": {
+            "type": "uid"
+        },
+        "description": {
+            "type": "string"
+        },
+        "fields": {
+            "type": "json"
+        },
+        "metaobject_entries": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::metaobject-entry.metaobject-entry",
+            "mappedBy": "metaobject_definition"
+        }
+    }
+}

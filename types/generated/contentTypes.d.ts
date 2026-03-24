@@ -430,6 +430,146 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiMetaobjectDefinitionMetaobjectDefinition
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'metaobject_definitions';
+  info: {
+    displayName: 'MetaobjectDefinition';
+    pluralName: 'metaobject-definitions';
+    singularName: 'metaobject-definition';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.String;
+    fields: Schema.Attribute.JSON;
+    key: Schema.Attribute.UID;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::metaobject-definition.metaobject-definition'
+    > &
+      Schema.Attribute.Private;
+    metaobject_entries: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::metaobject-entry.metaobject-entry'
+    >;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMetaobjectEntryMetaobjectEntry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'metaobject_entries';
+  info: {
+    displayName: 'MetaobjectEntry';
+    pluralName: 'metaobject-entries';
+    singularName: 'metaobject-entry';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    data: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::metaobject-entry.metaobject-entry'
+    > &
+      Schema.Attribute.Private;
+    metaobject_definition: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::metaobject-definition.metaobject-definition'
+    >;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPageMetafieldDefinitionPageMetafieldDefinition
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'page_metafield_definitions';
+  info: {
+    displayName: 'PageMetafieldDefinition';
+    pluralName: 'page-metafield-definitions';
+    singularName: 'page-metafield-definition';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    key: Schema.Attribute.UID;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::page-metafield-definition.page-metafield-definition'
+    > &
+      Schema.Attribute.Private;
+    metaobject_definition_key: Schema.Attribute.String;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    type: Schema.Attribute.Enumeration<
+      ['text', 'number', 'boolean', 'image', 'url', 'metaobject_ref']
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPageTemplatePageTemplate
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'page_templates';
+  info: {
+    displayName: 'Page Template';
+    pluralName: 'page-templates';
+    singularName: 'page-template';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    isDefault: Schema.Attribute.Boolean;
+    key: Schema.Attribute.UID & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::page-template.page-template'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    previewImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    sections: Schema.Attribute.Component<'test.section-instance', true>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPagePage extends Struct.CollectionTypeSchema {
   collectionName: 'pages';
   info: {
@@ -444,11 +584,16 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    isHomepage: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
+    metafields: Schema.Attribute.JSON;
+    page_template: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::page-template.page-template'
+    >;
     publishedAt: Schema.Attribute.DateTime;
-    sections: Schema.Attribute.Component<'test.section-instance', true>;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -1048,6 +1193,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::metaobject-definition.metaobject-definition': ApiMetaobjectDefinitionMetaobjectDefinition;
+      'api::metaobject-entry.metaobject-entry': ApiMetaobjectEntryMetaobjectEntry;
+      'api::page-metafield-definition.page-metafield-definition': ApiPageMetafieldDefinitionPageMetafieldDefinition;
+      'api::page-template.page-template': ApiPageTemplatePageTemplate;
       'api::page.page': ApiPagePage;
       'api::site.site': ApiSiteSite;
       'api::theme.theme': ApiThemeTheme;

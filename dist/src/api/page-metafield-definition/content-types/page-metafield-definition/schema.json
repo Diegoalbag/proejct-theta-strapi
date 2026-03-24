@@ -1,0 +1,36 @@
+{
+    "kind": "collectionType",
+    "collectionName": "page_metafield_definitions",
+    "info": {
+        "singularName": "page-metafield-definition",
+        "pluralName": "page-metafield-definitions",
+        "displayName": "PageMetafieldDefinition"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "key": {
+            "type": "uid"
+        },
+        "type": {
+            "type": "enumeration",
+            "enum": [
+                "text",
+                "number",
+                "boolean",
+                "image",
+                "url",
+                "metaobject_ref"
+            ]
+        },
+        "metaobject_definition_key": {
+            "type": "string"
+        }
+    }
+}
