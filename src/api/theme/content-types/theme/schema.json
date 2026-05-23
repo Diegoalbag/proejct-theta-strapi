@@ -46,6 +46,7 @@
       "enum": [
         "active",
         "installed",
+        "installing",
         "updating",
         "error"
       ]
@@ -103,6 +104,12 @@
       "type": "string"
     },
     "githubBuildBranch": {
+      "type": "string"
+    },
+    "deployCallbackToken": {
+      "type": "string"
+    },
+    "workflowVersion": {
       "type": "string"
     }
   }
