@@ -48,3 +48,57 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Redeploy all tenant Strapi services on Railway
+        if: success()
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAILWAY_API: https://backboard.railway.com/graphql/v2
+        run: |
+          if [ -z "$RAILWAY_API_TOKEN" ]; then
+            echo "⚠ RAILWAY_API_TOKEN not set — skipping redeploy"
+            exit 0
+          fi
+
+          gql() {
+            curl -s -H "Authorization: Bearer $RAILWAY_API_TOKEN" \
+                 -H "Content-Type: application/json" \
+                 -d "{\"query\": \"$1\"}" "$RAILWAY_API"
+          }
+
+          # 1. List all projects
+          PROJECT_IDS=$(gql "{ projects { edges { node { id } } } }" \
+            | jq -r '.data.projects.edges[].node.id')
+
+          TOTAL=0
+          for PID in $PROJECT_IDS; do
+            # 2. Get services + environments for this project
+            DATA=$(gql "{ project(id: \\\"$PID\\\") { name services { edges { node { id name } } } environments { edges { node { id name } } } } }")
+
+            PROJECT_NAME=$(echo "$DATA" | jq -r '.data.project.name')
+
+            # 3. Find services whose name contains "strapi" (case-insensitive)
+            SIDS=$(echo "$DATA" | jq -r '.data.project.services.edges[].node | select(.name | ascii_downcase | contains("strapi")) | .id')
+            [ -z "$SIDS" ] && continue
+
+            # 4. Pick the production environment (fall back to first)
+            ENV_ID=$(echo "$DATA" | jq -r '
+              .data.project.environments.edges[].node
+              | select(.name | ascii_downcase | test("prod"))
+              | .id' | head -1)
+            [ -z "$ENV_ID" ] && ENV_ID=$(echo "$DATA" | jq -r '.data.project.environments.edges[0].node.id')
+
+            # 5. Redeploy each matching service
+            for SID in $SIDS; do
+              echo "↻ Redeploying in project \"$PROJECT_NAME\" (service $SID, env $ENV_ID)…"
+              RESULT=$(gql "mutation { serviceInstanceRedeploy(serviceId: \\\"$SID\\\", environmentId: \\\"$ENV_ID\\\") }")
+              if echo "$RESULT" | jq -e '.errors' > /dev/null 2>&1; then
+                echo "⚠ Failed: $(echo "$RESULT" | jq -c '.errors')"
+              else
+                echo "✓ Triggered"
+                TOTAL=$((TOTAL + 1))
+              fi
+            done
+          done
+
+          echo "Done — triggered $TOTAL redeploy(s)"
