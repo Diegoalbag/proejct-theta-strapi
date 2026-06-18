@@ -128,7 +128,7 @@ async function ensureDefaultContent(strapi: Core.Strapi) {
         title: 'Homepage',
         slug: 'homepage',
         isHomepage: true,
-        page_template: template.documentId,
+        page_template: [template.documentId],
       },
       status: 'published',
     });
