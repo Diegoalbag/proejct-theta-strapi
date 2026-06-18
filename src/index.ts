@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import { runThemeScopeMigration } from './migrations/theme-scope';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {},
@@ -6,6 +7,7 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await runProvisioningBootstrap(strapi);
     await ensureDefaultContent(strapi);
+    await runThemeScopeMigration(strapi);
   },
 };
 
