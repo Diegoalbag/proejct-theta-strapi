@@ -39,6 +39,11 @@
     },
     "isDefault": {
       "type": "boolean"
+    },
+    "theme": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::theme.theme"
     }
   }
 }

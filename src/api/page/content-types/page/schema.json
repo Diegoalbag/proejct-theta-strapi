@@ -20,7 +20,7 @@
     },
     "page_template": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToMany",
       "target": "api::page-template.page-template"
     },
     "isHomepage": {

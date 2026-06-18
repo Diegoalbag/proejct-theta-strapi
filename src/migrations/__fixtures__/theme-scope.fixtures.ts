@@ -14,6 +14,8 @@
  * over the active-but-older theme).
  */
 
+import { vi } from "vitest";
+
 export interface ThemeFixture {
   documentId: string;
   name: string;
@@ -142,11 +144,6 @@ export interface StrapiMockSeed {
  *   - templates: `key.$eq` + `theme.documentId.$eq` (uniqueness check)
  */
 export function makeStrapiMock(seed: StrapiMockSeed = {}) {
-  // Lazy require so the fixtures file stays importable in any env; vitest is the
-  // only consumer and always provides `vi`.
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { vi } = require("vitest") as typeof import("vitest");
-
   const themes = seed.themes ?? [];
   const templates = seed.templates ?? [];
   const site = seed.site ?? null;

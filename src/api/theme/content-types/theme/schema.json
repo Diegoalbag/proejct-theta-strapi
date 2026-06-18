@@ -61,9 +61,6 @@
         "audios"
       ]
     },
-    "isActive": {
-      "type": "boolean"
-    },
     "installedAt": {
       "type": "datetime"
     },
