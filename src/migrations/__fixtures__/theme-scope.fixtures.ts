@@ -21,6 +21,8 @@ export interface ThemeFixture {
   name: string;
   /** D-13: present only to prove it is ignored. */
   isActive?: boolean;
+  /** DEVID-04: dev-mode themes are NEVER live and must be dropped before the ladder. */
+  isDev?: boolean;
   lastDeployedAt?: string | null;
   deploymentStatus?: string;
   builtAssetUrl?: string | null;
@@ -88,6 +90,44 @@ export const themesNoneMultipleDeployed: ThemeFixture[] = [
 export const themesNoneMultipleAmbiguous: ThemeFixture[] = [
   { documentId: "theme-a", name: "Theme A", lastDeployedAt: null },
   { documentId: "theme-b", name: "Theme B", lastDeployedAt: null },
+];
+
+// --- isDev fixtures (DEVID-04) --------------------------------------------
+
+/**
+ * Exactly one theme, and it is a dev theme. A lone isDev theme must NEVER be
+ * promoted to live — guards the `length === 1` branch of resolveLiveTheme so the
+ * dev record can't slip past the ladder (DEVID-04 / RESEARCH Pitfall 5).
+ * Expected: resolveLiveTheme(themesDevOnly) -> null.
+ */
+export const themesDevOnly: ThemeFixture[] = [
+  {
+    documentId: "theme-dev-solo",
+    name: "Dev Solo",
+    isDev: true,
+    lastDeployedAt: "2026-06-10T00:00:00.000Z",
+  },
+];
+
+/**
+ * A dev theme deployed MOST recently alongside an earlier-deployed hosted theme.
+ * The ladder must DROP the dev theme first and resolve to the hosted theme —
+ * proving the most-recently-deployed pick skips isDev (DEVID-04).
+ * Expected: resolveLiveTheme(themesHostedPlusDev) -> "theme-hosted".
+ */
+export const themesHostedPlusDev: ThemeFixture[] = [
+  {
+    documentId: "theme-dev-recent",
+    name: "Dev Recent",
+    isDev: true,
+    lastDeployedAt: "2026-06-15T00:00:00.000Z",
+  },
+  {
+    documentId: "theme-hosted",
+    name: "Hosted Earlier",
+    isDev: false,
+    lastDeployedAt: "2026-06-01T00:00:00.000Z",
+  },
 ];
 
 // --- Template fixtures ----------------------------------------------------

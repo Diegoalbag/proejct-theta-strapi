@@ -22,6 +22,8 @@ import {
   templatesWithTheme,
   templatesWithoutTheme,
   themesActiveOne,
+  themesDevOnly,
+  themesHostedPlusDev,
   themesNoneMultipleAmbiguous,
   themesNoneMultipleDeployed,
   themesNoneOneOnly,
@@ -52,6 +54,22 @@ describe("resolveLiveTheme — D-09 fallback ladder (no isActive, D-13)", () => 
     // result is `theme-recent` — proving the isActive branch is REMOVED.
     const result = resolveLiveTheme(themesActiveOne);
     expect(result?.documentId).toBe("theme-recent");
+  });
+});
+
+// RED (Phase 6, Wave 0): the current resolveLiveTheme has NO isDev awareness, so
+// case (1) returns the lone dev theme (length===1 branch) and case (2) returns
+// the most-recently-deployed dev theme — both FAIL. That assertion failure IS
+// the gate for Plan 02's `hosted = themes.filter((t) => !t.isDev)` edit (DEVID-04).
+describe("resolveLiveTheme drops isDev before the ladder (DEVID-04)", () => {
+  it("returns null for a lone isDev theme (a dev theme is NEVER live — guards length===1)", () => {
+    const result = resolveLiveTheme(themesDevOnly);
+    expect(result).toBeNull();
+  });
+
+  it("drops a most-recently-deployed isDev theme and resolves to the hosted theme", () => {
+    const result = resolveLiveTheme(themesHostedPlusDev);
+    expect(result?.documentId).toBe("theme-hosted");
   });
 });
 
