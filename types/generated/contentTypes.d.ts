@@ -659,6 +659,7 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
     githubRepoName: Schema.Attribute.String;
     githubRepoUrl: Schema.Attribute.String;
     installedAt: Schema.Attribute.DateTime;
+    isDev: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     lastBuildCommit: Schema.Attribute.String;
     lastDeployedAt: Schema.Attribute.DateTime;
     lastSyncAt: Schema.Attribute.DateTime;
