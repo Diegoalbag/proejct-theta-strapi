@@ -1,10 +1,16 @@
 import type { Core } from '@strapi/strapi';
 import { runThemeScopeMigration } from './migrations/theme-scope';
+import { dropPageTemplateKeyGlobalUnique } from './migrations/page-template-key';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {},
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // Drop the legacy uid global-unique index on page_templates.key BEFORE any
+    // content creation, so a second theme's `homepage` can be written (MT-01 /
+    // dev-theme homepage provisioning). (theme,key) uniqueness lives in the
+    // page-template lifecycle hook, not a DB index.
+    await dropPageTemplateKeyGlobalUnique(strapi);
     await runProvisioningBootstrap(strapi);
     await ensureDefaultContent(strapi);
     await runThemeScopeMigration(strapi);

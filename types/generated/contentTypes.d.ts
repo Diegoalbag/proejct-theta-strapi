@@ -551,7 +551,7 @@ export interface ApiPageTemplatePageTemplate
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
     isDefault: Schema.Attribute.Boolean;
-    key: Schema.Attribute.UID & Schema.Attribute.Required;
+    key: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
