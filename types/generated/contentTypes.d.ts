@@ -564,6 +564,7 @@ export interface ApiPageTemplatePageTemplate
     >;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.Component<'test.section-instance', true>;
+    theme: Schema.Attribute.Relation<'manyToOne', 'api::theme.theme'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -590,7 +591,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     metafields: Schema.Attribute.JSON;
     page_template: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToMany',
       'api::page-template.page-template'
     >;
     publishedAt: Schema.Attribute.DateTime;
@@ -617,6 +618,7 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     homepage: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
+    liveTheme: Schema.Attribute.Relation<'oneToOne', 'api::theme.theme'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::site.site'> &
       Schema.Attribute.Private;
@@ -644,6 +646,7 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    deployCallbackToken: Schema.Attribute.String;
     deploymentStatus: Schema.Attribute.Enumeration<
       ['pending', 'building', 'ready', 'error']
     >;
@@ -656,7 +659,6 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
     githubRepoName: Schema.Attribute.String;
     githubRepoUrl: Schema.Attribute.String;
     installedAt: Schema.Attribute.DateTime;
-    isActive: Schema.Attribute.Boolean;
     lastBuildCommit: Schema.Attribute.String;
     lastDeployedAt: Schema.Attribute.DateTime;
     lastSyncAt: Schema.Attribute.DateTime;
@@ -672,7 +674,7 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
     sectionsManifest: Schema.Attribute.JSON;
     subdomain: Schema.Attribute.String;
     theme_status: Schema.Attribute.Enumeration<
-      ['active', 'installed', 'updating', 'error']
+      ['active', 'installed', 'installing', 'updating', 'error']
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -680,6 +682,7 @@ export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
     vercelProjectId: Schema.Attribute.String;
     version: Schema.Attribute.String;
     webhookId: Schema.Attribute.String;
+    workflowVersion: Schema.Attribute.String;
   };
 }
 
