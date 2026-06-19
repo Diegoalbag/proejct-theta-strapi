@@ -24,6 +24,10 @@ interface ThemeLike {
   documentId: string;
   name?: string;
   lastDeployedAt?: string | null;
+  // DEVID-04: dev-mode themes are NEVER live and are filtered out before the
+  // D-09 ladder (resolveLiveTheme). The deployed site reads Site.liveTheme only,
+  // so a dev theme can never be resolved as live, even on a single-theme tenant.
+  isDev?: boolean;
   // NOTE: the legacy active-flag is intentionally NOT referenced (D-13).
 }
 
@@ -39,14 +43,19 @@ interface TemplateLike {
  * PURE D-09 ladder. The legacy active-flag branch is removed (D-13).
  */
 export function resolveLiveTheme<T extends ThemeLike>(themes: T[]): T | null {
-  if (!Array.isArray(themes) || themes.length === 0) return null;
+  // DEVID-04 / RESEARCH Pitfall 5: drop dev themes BEFORE any length/deploy
+  // branch so a lone dev theme can never slip through the `length === 1` branch.
+  // Elevation-of-Privilege mitigation (T-06-01) — the entire ladder runs over
+  // `hosted`, never the raw `themes`.
+  const hosted = (themes ?? []).filter((t) => !t.isDev);
+  if (hosted.length === 0) return null;
 
-  // Branch 1: exactly one theme — unconditionally live.
-  if (themes.length === 1) return themes[0];
+  // Branch 1: exactly one hosted theme — unconditionally live.
+  if (hosted.length === 1) return hosted[0];
 
-  // Branch 2: among themes that have actually been deployed, pick the single
-  // most-recently-deployed by `lastDeployedAt`. Deploy timestamp only (D-13).
-  const deployed = themes.filter((t) => Boolean(t.lastDeployedAt));
+  // Branch 2: among hosted themes that have actually been deployed, pick the
+  // single most-recently-deployed by `lastDeployedAt`. Deploy timestamp only (D-13).
+  const deployed = hosted.filter((t) => Boolean(t.lastDeployedAt));
   if (deployed.length === 0) return null; // none deployed -> ambiguous
 
   const sorted = [...deployed].sort(
