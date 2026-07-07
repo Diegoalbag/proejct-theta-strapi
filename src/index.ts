@@ -1,6 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import { runThemeScopeMigration } from './migrations/theme-scope';
 import { dropPageTemplateKeyGlobalUnique } from './migrations/page-template-key';
+import { runImageFormatBackfill } from './migrations/image-format-backfill';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {},
@@ -14,6 +15,7 @@ export default {
     await runProvisioningBootstrap(strapi);
     await ensureDefaultContent(strapi);
     await runThemeScopeMigration(strapi);
+    await runImageFormatBackfill(strapi);
   },
 };
 
