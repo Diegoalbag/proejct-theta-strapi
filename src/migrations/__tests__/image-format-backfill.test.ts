@@ -71,10 +71,10 @@ describe("runImageFormatBackfill — idempotent WebP backfill + settings enablem
       },
     });
 
-    let result: Awaited<ReturnType<typeof runImageFormatBackfill>> | undefined;
-    await expect(async () => {
-      result = await runImageFormatBackfill(strapi as never);
-    }).not.toThrow();
+    // Awaiting directly (rather than wrapping in expect(...).not.toThrow())
+    // proves the function itself never throws: an uncaught rejection here
+    // would fail the test just as surely, and this way `result` is populated.
+    const result = await runImageFormatBackfill(strapi as never);
 
     expect(result).toMatchObject({ migrated: true, count: 1 });
     // only id 12 (the non-throwing file missing webp) was actually updated
@@ -108,10 +108,7 @@ describe("runImageFormatBackfill — idempotent WebP backfill + settings enablem
     const { strapi, spies } = makeUploadStrapiMock({ files: filesNeedingBackfill });
     spies.getSettings.mockRejectedValueOnce(new Error("store unavailable"));
 
-    let result: Awaited<ReturnType<typeof runImageFormatBackfill>> | undefined;
-    await expect(async () => {
-      result = await runImageFormatBackfill(strapi as never);
-    }).not.toThrow();
+    const result = await runImageFormatBackfill(strapi as never);
 
     expect(result).toEqual({});
   });
