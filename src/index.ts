@@ -13,6 +13,10 @@ export default {
     // page-template lifecycle hook, not a DB index.
     await dropPageTemplateKeyGlobalUnique(strapi);
     await runProvisioningBootstrap(strapi);
+    // Runs on EVERY boot, unlike runProvisioningBootstrap (first-boot only), so
+    // tenants provisioned before the form builder existed self-heal on their next
+    // deploy. See the function's header for why this can't live on the platform.
+    await ensureFormIngestToken(strapi);
     await ensureDefaultContent(strapi);
     await runThemeScopeMigration(strapi);
     await runImageFormatBackfill(strapi);
@@ -102,6 +106,96 @@ async function runProvisioningBootstrap(strapi: Core.Strapi) {
     }
   } catch (err) {
     console.error('[bootstrap] Provisioning error:', err);
+  }
+}
+
+/** Name of the create-only token the tenant site's form ingest route runs as. */
+const FORM_INGEST_TOKEN_NAME = 'form-ingest-token';
+
+/**
+ * The narrow permission set the ingest token is allowed to exercise. Deliberately
+ * NOT read: the tenant site already holds the read-only public token for loading
+ * the form definition it validates against, so this token needs no read grant.
+ */
+const FORM_INGEST_PERMISSIONS = [
+  'api::form-submission.form-submission.create',
+  'plugin::upload.content-api.upload',
+];
+
+/**
+ * Mint the form-ingest API token and hand it to the platform.
+ *
+ * WHY THIS LIVES HERE AND NOT ON THE PLATFORM
+ * Creating an API token is an ADMIN route (`admin::isAuthenticatedAdmin` on
+ * POST /admin/api-tokens) and requires an admin JWT. The platform only ever
+ * receives API tokens — the bootstrap admin's password is random and discarded,
+ * never sent in the callback — so the platform physically cannot mint this. The
+ * self-healing therefore runs inside each tenant's own Strapi.
+ *
+ * WHY EVERY BOOT, NOT FIRST BOOT
+ * runProvisioningBootstrap returns early once an admin user exists, so tenants
+ * provisioned before the form builder shipped would never get a token. This runs
+ * unconditionally and is idempotent via a name lookup, so every existing tenant
+ * self-heals on its next deploy — and the CD pipeline already redeploys every
+ * tenant Strapi on a push to main.
+ *
+ * WHY IT REVOKES ON CALLBACK FAILURE
+ * `accessKey` is returned only at creation; afterwards Strapi stores it hashed and
+ * it can never be read back. If the token were kept after a failed callback, the
+ * name lookup would skip creation forever and the platform would be permanently
+ * without a key it can't recover. Revoking on failure keeps the next boot retryable.
+ *
+ * Degrades quietly: a tenant without this token simply can't accept submissions.
+ * Unlike the read-only public token (SEC-02, fail-closed), a missing ingest token
+ * leaks nothing, so it must never block a boot or a deploy.
+ */
+async function ensureFormIngestToken(strapi: Core.Strapi) {
+  const callbackUrl = process.env.PROVISIONING_CALLBACK_URL;
+  const teamId = process.env.PROVISIONING_TEAM_ID;
+
+  if (!callbackUrl || !teamId) return; // not a provisioned instance (e.g. local dev)
+
+  try {
+    const existing = await strapi.service('admin::api-token').getByName(FORM_INGEST_TOKEN_NAME);
+    if (existing) return; // already minted and delivered
+
+    console.log('[bootstrap] Minting form-ingest token...');
+
+    const ingestResult = await strapi.service('admin::api-token').create({
+      name: FORM_INGEST_TOKEN_NAME,
+      description: 'Create-only token for public form submissions (tenant site ingest route)',
+      type: 'custom',
+      permissions: FORM_INGEST_PERMISSIONS,
+      lifespan: null, // never expires
+    });
+
+    const response = await fetch(callbackUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-provisioning-secret': process.env.PROVISIONING_SECRET ?? '',
+      },
+      body: JSON.stringify({
+        teamId,
+        strapiFormToken: ingestResult.accessKey,
+      }),
+    });
+
+    if (!response.ok) {
+      // Roll back so the next boot can retry — see header.
+      await strapi.service('admin::api-token').revoke(ingestResult.id);
+      console.error(
+        '[bootstrap] Form-ingest callback failed, token revoked for retry:',
+        response.status,
+        await response.text()
+      );
+      return;
+    }
+
+    console.log('[bootstrap] Form-ingest token delivered to central app.');
+  } catch (err) {
+    // Never block boot — forms degrade, everything else keeps working.
+    console.error('[bootstrap] Form-ingest token error:', err);
   }
 }
 
