@@ -666,6 +666,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       'api::page-template.page-template'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -677,6 +678,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
 export interface ApiSiteSite extends Struct.SingleTypeSchema {
   collectionName: 'sites';
   info: {
+    description: "siteLocale (not `locale`) carries D-09's BCP-47 site locale string. `locale` is unusable here: @strapi/i18n's extendContentTypes overwrites any `locale` attribute on every content type at boot with a private, invisible, non-configurable one, which @strapi/plugin-graphql's isNotPrivate filter then drops from the schema, failing the whole Site GraphQL query. See 14-01-SUMMARY.md for the recorded decision.";
     displayName: 'Site';
     pluralName: 'sites';
     singularName: 'site';
@@ -695,9 +697,16 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    siteLocale: Schema.Attribute.String;
+    siteUrl: Schema.Attribute.String;
+    titleTemplate: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    verificationBing: Schema.Attribute.String;
+    verificationGoogle: Schema.Attribute.String;
+    verificationYandex: Schema.Attribute.String;
   };
 }
 

@@ -28,6 +28,11 @@
     },
     "metafields": {
       "type": "json"
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }

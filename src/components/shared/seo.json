@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_shared_seos",
+  "info": {
+    "displayName": "SEO",
+    "icon": "search",
+    "description": "Attached non-repeatably to both Page and Site so the Phase-15 fallback chain reads one vocabulary. The Site-level copy exists per D-02 but is not read as a page default until Phase 15."
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "noindex": {
+      "type": "boolean",
+      "default": false
+    },
+    "shareImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  },
+  "config": {}
+}

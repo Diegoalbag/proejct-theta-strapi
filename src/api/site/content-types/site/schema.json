@@ -4,7 +4,8 @@
   "info": {
     "singularName": "site",
     "pluralName": "sites",
-    "displayName": "Site"
+    "displayName": "Site",
+    "description": "siteLocale (not `locale`) carries D-09's BCP-47 site locale string. `locale` is unusable here: @strapi/i18n's extendContentTypes overwrites any `locale` attribute on every content type at boot with a private, invisible, non-configurable one, which @strapi/plugin-graphql's isNotPrivate filter then drops from the schema, failing the whole Site GraphQL query. See 14-01-SUMMARY.md for the recorded decision."
   },
   "options": {
     "draftAndPublish": true
@@ -23,6 +24,29 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::theme.theme"
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false
+    },
+    "siteUrl": {
+      "type": "string"
+    },
+    "siteLocale": {
+      "type": "string"
+    },
+    "titleTemplate": {
+      "type": "string"
+    },
+    "verificationGoogle": {
+      "type": "string"
+    },
+    "verificationBing": {
+      "type": "string"
+    },
+    "verificationYandex": {
+      "type": "string"
     }
   }
 }
