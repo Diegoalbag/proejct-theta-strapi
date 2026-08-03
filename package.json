@@ -23,7 +23,6 @@
     "@strapi/plugin-graphql": "^5.18.0",
     "@strapi/plugin-users-permissions": "5.31.0",
     "@strapi/strapi": "5.31.0",
-    "adaptive-value-field": "file:./src/plugins/adaptive-value-field",
     "fs-extra": "^10.0.0",
     "mime-types": "^2.1.27",
     "pg": "8.8.0",
