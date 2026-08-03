@@ -29,7 +29,14 @@ RUN APP_KEYS=build-only-key1,build-only-key2 \
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-RUN corepack enable
+# NOTE: deliberately no `corepack enable` here. package.json pins
+# packageManager=yarn@4.9.3 (needed so the builder's `yarn install --immutable`
+# honors the Berry lockfile), but the runner never runs an install — it only
+# receives node_modules from the builder. Enabling corepack here made Berry
+# activate against a directory with no install state and abort with
+# "The project in /app/package.json doesn't seem to have been installed",
+# and made every container boot download yarn.js from the network first.
+# The runtime invokes the strapi binary directly instead of going through yarn.
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
@@ -49,4 +56,4 @@ COPY --from=builder /app/favicon.png ./favicon.png
 
 EXPOSE 1337
 
-CMD ["yarn", "start"]
+CMD ["node", "node_modules/.bin/strapi", "start"]
