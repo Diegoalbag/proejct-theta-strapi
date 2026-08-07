@@ -653,6 +653,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    canonicalUrl: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -669,6 +670,38 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     seo: Schema.Attribute.Component<'shared.seo', false>;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRedirectRedirect extends Struct.CollectionTypeSchema {
+  collectionName: 'redirects';
+  info: {
+    displayName: 'Redirect';
+    pluralName: 'redirects';
+    singularName: 'redirect';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    destination: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::redirect.redirect'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    redirectType: Schema.Attribute.Enumeration<['permanent', 'temporary']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'permanent'>;
+    source: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1284,6 +1317,7 @@ declare module '@strapi/strapi' {
       'api::page-metafield-definition.page-metafield-definition': ApiPageMetafieldDefinitionPageMetafieldDefinition;
       'api::page-template.page-template': ApiPageTemplatePageTemplate;
       'api::page.page': ApiPagePage;
+      'api::redirect.redirect': ApiRedirectRedirect;
       'api::site.site': ApiSiteSite;
       'api::theme.theme': ApiThemeTheme;
       'plugin::content-releases.release': PluginContentReleasesRelease;

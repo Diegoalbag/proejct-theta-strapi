@@ -33,6 +33,9 @@
       "type": "component",
       "component": "shared.seo",
       "repeatable": false
+    },
+    "canonicalUrl": {
+      "type": "string"
     }
   }
 }

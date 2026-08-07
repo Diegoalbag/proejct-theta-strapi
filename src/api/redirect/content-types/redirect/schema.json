@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "redirects",
+  "info": {
+    "singularName": "redirect",
+    "pluralName": "redirects",
+    "displayName": "Redirect"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "source": {
+      "type": "string",
+      "required": true
+    },
+    "destination": {
+      "type": "string",
+      "required": true
+    },
+    "redirectType": {
+      "type": "enumeration",
+      "enum": ["permanent", "temporary"],
+      "default": "permanent",
+      "required": true
+    }
+  }
+}
