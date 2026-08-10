@@ -47,6 +47,9 @@
     },
     "verificationYandex": {
       "type": "string"
+    },
+    "verificationAhrefs": {
+      "type": "string"
     }
   }
 }
