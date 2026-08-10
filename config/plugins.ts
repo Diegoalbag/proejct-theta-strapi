@@ -1,4 +1,6 @@
-export default () => ({
+import { buildUploadConfig } from "../src/utils/upload-provider";
+
+export default ({ env }: { env: (key: string, def?: string) => string }) => ({
   graphql: {
     config: {
       defaultLimit: 100,
@@ -17,6 +19,9 @@ export default () => ({
         medium: 750,
         small: 500,
       },
+      // S3-compatible object storage when configured, local disk otherwise.
+      // See config/upload-provider.ts for why this is conditional.
+      ...buildUploadConfig(env),
     },
   },
 });
