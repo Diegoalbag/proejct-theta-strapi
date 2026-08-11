@@ -430,6 +430,36 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
+  collectionName: 'authors';
+  info: {
+    description: "D-12: Author is a standalone tenant-Strapi collection type, not derived from a platform user account, so a guest contributor with no login can carry a byline and the tenant Strapi stays self-contained. D-13: name and avatar only \u2014 no slug, because Phase 22 defines no author archive URL and Phase 23's Article JSON-LD is satisfied by a Person node carrying a name; adding a slug later would need a backfill across every tenant that already has author records. D-15: draftAndPublish is off, and an article names at most one author \u2014 both by analogy with D-10/D-07, neither put to the user directly, and neither contradicted by research. The `articles` inverse relation (oneToMany, mappedBy: author) is added in Plan 06 once api::article.article exists. Known hazard: tenant media is currently ephemeral on Railway \u2014 the S3 provider shipped but is inert and the R2 migration is deferred, with Phase 17 having measured 12 of 12 tenant images returning 404. `avatar` inherits that, exactly as every existing media field does. This is a recorded risk, not a Phase 19 blocker: no schema change is required when storage moves.";
+    displayName: 'Author';
+    pluralName: 'authors';
+    singularName: 'author';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    avatar: Schema.Attribute.Media<'images'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::author.author'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
@@ -1374,6 +1404,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::form.form': ApiFormForm;
