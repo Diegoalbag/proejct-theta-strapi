@@ -702,6 +702,7 @@ export interface ApiRedirectRedirect extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'permanent'>;
     source: Schema.Attribute.String & Schema.Attribute.Required;
+    trackClicks: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

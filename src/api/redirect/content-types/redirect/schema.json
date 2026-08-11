@@ -24,6 +24,10 @@
       "enum": ["permanent", "temporary"],
       "default": "permanent",
       "required": true
+    },
+    "trackClicks": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

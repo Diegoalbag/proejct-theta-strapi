@@ -22,10 +22,10 @@ const contentTypesDtsPath = path.join(
 );
 
 describe("Redirect content type shape (Task 1 decision: redirectType, word-valued enum)", () => {
-  it("declares exactly the three domain attributes plus draftAndPublish: false", () => {
+  it("declares exactly the four domain attributes plus draftAndPublish: false", () => {
     const attrs = redirectSchema.attributes as Record<string, unknown>;
     expect(Object.keys(attrs).sort()).toEqual(
-      ["destination", "redirectType", "source"].sort()
+      ["destination", "redirectType", "source", "trackClicks"].sort()
     );
     expect(redirectSchema.options.draftAndPublish).toBe(false);
   });
@@ -44,6 +44,16 @@ describe("Redirect content type shape (Task 1 decision: redirectType, word-value
     expect(attrs.redirectType.enum).toEqual(["permanent", "temporary"]);
     expect(attrs.redirectType.default).toBe("permanent");
     expect(attrs.redirectType.required).toBe(true);
+  });
+
+  it("trackClicks is an optional boolean defaulting to false (REQ-2)", () => {
+    // Default false, never required: every redirect that existed before this
+    // field reads as untracked, which is the only safe interpretation — an
+    // absent value must never be inferred as consent to count.
+    const attrs = redirectSchema.attributes as Record<string, any>;
+    expect(attrs.trackClicks.type).toBe("boolean");
+    expect(attrs.trackClicks.default).toBe(false);
+    expect(attrs.trackClicks.required).toBeUndefined();
   });
 
   it("collection metadata matches api::redirect.redirect", () => {
@@ -80,6 +90,16 @@ describe("Generated-types-in-sync gate", () => {
     const text = readFileSync(contentTypesDtsPath, "utf-8");
     expect(text).toContain(
       "redirectType: Schema.Attribute.Enumeration<['permanent', 'temporary']>"
+    );
+  });
+
+  it("contentTypes.d.ts's ApiRedirectRedirect interface declares trackClicks", () => {
+    // The platform's GetRedirects query selects this field, so a schema
+    // change that shipped without the regenerated types would break the
+    // production Docker build before any tenant ever saw the field.
+    const text = readFileSync(contentTypesDtsPath, "utf-8");
+    expect(text).toContain(
+      "trackClicks: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>"
     );
   });
 
