@@ -779,6 +779,34 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiTagTag extends Struct.CollectionTypeSchema {
+  collectionName: 'tags';
+  info: {
+    description: 'D-06: Tag is a separate collection type from Category, not one type with a discriminator \u2014 this is what gives Phase 22 distinct archive routes and Phase 20 separate pickers with no filtering. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off \u2014 an assigned tag must never be silently invisible on the live site. The `articles` inverse relation (manyToMany, mappedBy: tags) is added in Plan 06 once api::article.article exists.';
+    displayName: 'Tag';
+    pluralName: 'tags';
+    singularName: 'tag';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiThemeTheme extends Struct.CollectionTypeSchema {
   collectionName: 'themes';
   info: {
@@ -1356,6 +1384,7 @@ declare module '@strapi/strapi' {
       'api::page.page': ApiPagePage;
       'api::redirect.redirect': ApiRedirectRedirect;
       'api::site.site': ApiSiteSite;
+      'api::tag.tag': ApiTagTag;
       'api::theme.theme': ApiThemeTheme;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
