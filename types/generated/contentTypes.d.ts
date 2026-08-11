@@ -430,10 +430,48 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
+  collectionName: 'articles';
+  info: {
+    description: "D-01 / T-19-13 (Tampering, severity high, disposition transfer): body is stored as a sanitized-HTML richtext string. Strapi performs NO server-side HTML sanitization on a richtext attribute \u2014 it stores exactly what is written to it. Sanitization is the platform's responsibility on the write path in Phase 20, and Phase 21 renders the result via dangerouslySetInnerHTML inside a theme bundle. A rich-text editor shipped without a write-path sanitizer makes this a stored cross-site-scripting hole on every tenant site. Phase 20 MUST NOT ship without sanitizing on write; this obligation is also recorded in 19-05-DECISIONS.md and the Plan 05 checkpoint. D-03: excerpt is optional; when blank, listings and meta description derive from roughly the first 160 characters of stripped body text AT READ TIME \u2014 that derivation lives in the platform and the theme, not here; this schema stores an unbounded text value and truncates nothing. D-04/D-05: the shared.seo component is attached non-repeatably so the Phase 15 site-to-page fallback chain and SERP preview apply to articles with no new SEO vocabulary; publish state is native publishedAt via draftAndPublish:true and there is no custom status attribute. D-07/D-11/D-14/D-15: exactly one category, optional; many tags; at most one author, optional with the byline simply omitted when absent \u2014 an uncategorized post appears in /blog but in no category archive. Slug policy: uid uniqueness is scoped to this content type only; an article slug may equal a page slug, which is safe because articles live under a /blog prefix from Phase 22 \u2014 no cross-type uniqueness mechanism is added, no lifecycle hook file exists under src/api/article/. Media hazard: featuredImage and inline body images both live on the tenant media library, which is currently ephemeral on Railway \u2014 the S3 provider shipped but is inert and the R2 migration is deferred, with Phase 17 having measured 12 of 12 tenant images returning 404; recorded as a known risk, not a Phase 19 blocker, no schema change needed when storage moves. Reserved attribute: the key @strapi/i18n overwrites at boot (locale) is deliberately unused, as documented in site/schema.json.";
+    displayName: 'Article';
+    pluralName: 'articles';
+    singularName: 'article';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
+    body: Schema.Attribute.RichText;
+    canonicalUrl: Schema.Attribute.String;
+    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    excerpt: Schema.Attribute.Text;
+    featuredImage: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::article.article'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    slug: Schema.Attribute.UID<'title'>;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   collectionName: 'authors';
   info: {
-    description: "D-12: Author is a standalone tenant-Strapi collection type, not derived from a platform user account, so a guest contributor with no login can carry a byline and the tenant Strapi stays self-contained. D-13: name and avatar only \u2014 no slug, because Phase 22 defines no author archive URL and Phase 23's Article JSON-LD is satisfied by a Person node carrying a name; adding a slug later would need a backfill across every tenant that already has author records. D-15: draftAndPublish is off, and an article names at most one author \u2014 both by analogy with D-10/D-07, neither put to the user directly, and neither contradicted by research. The `articles` inverse relation (oneToMany, mappedBy: author) is added in Plan 06 once api::article.article exists. Known hazard: tenant media is currently ephemeral on Railway \u2014 the S3 provider shipped but is inert and the R2 migration is deferred, with Phase 17 having measured 12 of 12 tenant images returning 404. `avatar` inherits that, exactly as every existing media field does. This is a recorded risk, not a Phase 19 blocker: no schema change is required when storage moves.";
+    description: "D-12: Author is a standalone tenant-Strapi collection type, not derived from a platform user account, so a guest contributor with no login can carry a byline and the tenant Strapi stays self-contained. D-13: name and avatar only \u2014 no slug, because Phase 22 defines no author archive URL and Phase 23's Article JSON-LD is satisfied by a Person node carrying a name; adding a slug later would need a backfill across every tenant that already has author records. D-15: draftAndPublish is off, and an article names at most one author \u2014 both by analogy with D-10/D-07, neither put to the user directly, and neither contradicted by research. The `articles` inverse relation (oneToMany, mappedBy: author) was added in Plan 06 alongside api::article.article. Known hazard: tenant media is currently ephemeral on Railway \u2014 the S3 provider shipped but is inert and the R2 migration is deferred, with Phase 17 having measured 12 of 12 tenant images returning 404. `avatar` inherits that, exactly as every existing media field does. This is a recorded risk, not a Phase 19 blocker: no schema change is required when storage moves.";
     displayName: 'Author';
     pluralName: 'authors';
     singularName: 'author';
@@ -442,6 +480,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
     avatar: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -463,7 +502,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
-    description: 'D-06: Category is a separate collection type from Tag, not one type with a discriminator. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off \u2014 an assigned category must never be silently invisible on the live site. D-08: flat, no parent/child self-relation. The `articles` inverse relation (oneToMany, mappedBy: category) is added in Plan 06 once api::article.article exists.';
+    description: 'D-06: Category is a separate collection type from Tag, not one type with a discriminator. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off \u2014 an assigned category must never be silently invisible on the live site. D-08: flat, no parent/child self-relation. The `articles` inverse relation (oneToMany, mappedBy: category) was added in Plan 06 alongside api::article.article.';
     displayName: 'Category';
     pluralName: 'categories';
     singularName: 'category';
@@ -472,6 +511,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -812,7 +852,7 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
 export interface ApiTagTag extends Struct.CollectionTypeSchema {
   collectionName: 'tags';
   info: {
-    description: 'D-06: Tag is a separate collection type from Category, not one type with a discriminator \u2014 this is what gives Phase 22 distinct archive routes and Phase 20 separate pickers with no filtering. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off \u2014 an assigned tag must never be silently invisible on the live site. The `articles` inverse relation (manyToMany, mappedBy: tags) is added in Plan 06 once api::article.article exists.';
+    description: 'D-06: Tag is a separate collection type from Category, not one type with a discriminator \u2014 this is what gives Phase 22 distinct archive routes and Phase 20 separate pickers with no filtering. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off \u2014 an assigned tag must never be silently invisible on the live site. The `articles` inverse relation (manyToMany, mappedBy: tags) was added in Plan 06 alongside api::article.article.';
     displayName: 'Tag';
     pluralName: 'tags';
     singularName: 'tag';
@@ -821,6 +861,7 @@ export interface ApiTagTag extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    articles: Schema.Attribute.Relation<'manyToMany', 'api::article.article'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1404,6 +1445,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;

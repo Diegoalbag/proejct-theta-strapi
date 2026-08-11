@@ -5,7 +5,7 @@
     "singularName": "tag",
     "pluralName": "tags",
     "displayName": "Tag",
-    "description": "D-06: Tag is a separate collection type from Category, not one type with a discriminator — this is what gives Phase 22 distinct archive routes and Phase 20 separate pickers with no filtering. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off — an assigned tag must never be silently invisible on the live site. The `articles` inverse relation (manyToMany, mappedBy: tags) is added in Plan 06 once api::article.article exists."
+    "description": "D-06: Tag is a separate collection type from Category, not one type with a discriminator — this is what gives Phase 22 distinct archive routes and Phase 20 separate pickers with no filtering. D-09: name + uid slug (targetField: name) + optional description. D-10: draftAndPublish is off — an assigned tag must never be silently invisible on the live site. The `articles` inverse relation (manyToMany, mappedBy: tags) was added in Plan 06 alongside api::article.article."
   },
   "options": {
     "draftAndPublish": false
@@ -21,6 +21,12 @@
     },
     "description": {
       "type": "text"
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::article.article",
+      "mappedBy": "tags"
     }
   }
 }
