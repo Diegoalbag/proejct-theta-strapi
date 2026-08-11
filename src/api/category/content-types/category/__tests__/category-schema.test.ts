@@ -26,10 +26,10 @@ const contentTypesDtsPath = path.join(
 );
 
 describe("Category content type shape", () => {
-  it("declares exactly the three D-09 domain attributes", () => {
+  it("declares exactly the three D-09 domain attributes plus the Plan 06 articles inverse relation", () => {
     const attrs = categorySchema.attributes as Record<string, unknown>;
     expect(Object.keys(attrs).sort()).toEqual(
-      ["description", "name", "slug"].sort()
+      ["articles", "description", "name", "slug"].sort()
     );
   });
 
@@ -70,6 +70,16 @@ describe("Category content type shape", () => {
     expect("parent" in attrs).toBe(false);
     expect("children" in attrs).toBe(false);
     expect("categories" in attrs).toBe(false);
+  });
+
+  it("articles is the Plan 06 inverse of article.category (oneToMany, mappedBy: category)", () => {
+    const attrs = categorySchema.attributes as Record<string, any>;
+    expect(attrs.articles).toEqual({
+      type: "relation",
+      relation: "oneToMany",
+      target: "api::article.article",
+      mappedBy: "category",
+    });
   });
 
   it("collection metadata matches api::category.category", () => {

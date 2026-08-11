@@ -27,9 +27,11 @@ const contentTypesDtsPath = path.join(
 );
 
 describe("Author content type shape", () => {
-  it("declares exactly the D-13 domain attributes (name + avatar only)", () => {
+  it("declares exactly the D-13 domain attributes (name + avatar) plus the Plan 06 articles inverse relation", () => {
     const attrs = authorSchema.attributes as Record<string, unknown>;
-    expect(Object.keys(attrs).sort()).toEqual(["avatar", "name"].sort());
+    expect(Object.keys(attrs).sort()).toEqual(
+      ["articles", "avatar", "name"].sort()
+    );
   });
 
   it("draftAndPublish is off (D-15 — an author is always live)", () => {
@@ -69,9 +71,14 @@ describe("Author content type shape", () => {
     expect("socialLinks" in attrs).toBe(false);
   });
 
-  it("has no articles relation yet (Plan 06 adds it with Article)", () => {
-    const attrs = authorSchema.attributes as Record<string, unknown>;
-    expect("articles" in attrs).toBe(false);
+  it("articles is the Plan 06 inverse of article.author (oneToMany, mappedBy: author)", () => {
+    const attrs = authorSchema.attributes as Record<string, any>;
+    expect(attrs.articles).toEqual({
+      type: "relation",
+      relation: "oneToMany",
+      target: "api::article.article",
+      mappedBy: "author",
+    });
   });
 
   it("collection metadata matches api::author.author", () => {

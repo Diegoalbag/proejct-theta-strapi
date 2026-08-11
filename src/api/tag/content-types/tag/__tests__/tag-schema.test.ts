@@ -25,10 +25,10 @@ const contentTypesDtsPath = path.join(
 );
 
 describe("Tag content type shape", () => {
-  it("declares exactly the three D-09-style domain attributes", () => {
+  it("declares exactly the three D-09-style domain attributes plus the Plan 06 articles inverse relation", () => {
     const attrs = tagSchema.attributes as Record<string, unknown>;
     expect(Object.keys(attrs).sort()).toEqual(
-      ["description", "name", "slug"].sort()
+      ["articles", "description", "name", "slug"].sort()
     );
   });
 
@@ -64,9 +64,14 @@ describe("Tag content type shape", () => {
     }
   });
 
-  it("has no articles relation yet (Plan 06 adds it with Article)", () => {
-    const attrs = tagSchema.attributes as Record<string, unknown>;
-    expect("articles" in attrs).toBe(false);
+  it("articles is the Plan 06 inverse of article.tags (manyToMany, mappedBy: tags)", () => {
+    const attrs = tagSchema.attributes as Record<string, any>;
+    expect(attrs.articles).toEqual({
+      type: "relation",
+      relation: "manyToMany",
+      target: "api::article.article",
+      mappedBy: "tags",
+    });
   });
 
   it("collection metadata matches api::tag.tag", () => {
