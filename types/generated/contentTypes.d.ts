@@ -724,11 +724,14 @@ export interface ApiSiteSite extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    googleAdsId: Schema.Attribute.String;
+    googleAnalyticsId: Schema.Attribute.String;
     homepage: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     liveTheme: Schema.Attribute.Relation<'oneToOne', 'api::theme.theme'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::site.site'> &
       Schema.Attribute.Private;
+    metaPixelId: Schema.Attribute.String;
     name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     seo: Schema.Attribute.Component<'shared.seo', false>;

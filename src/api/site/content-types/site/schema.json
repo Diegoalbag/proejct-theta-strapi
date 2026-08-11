@@ -50,6 +50,15 @@
     },
     "verificationAhrefs": {
       "type": "string"
+    },
+    "googleAnalyticsId": {
+      "type": "string"
+    },
+    "googleAdsId": {
+      "type": "string"
+    },
+    "metaPixelId": {
+      "type": "string"
     }
   }
 }
