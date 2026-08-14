@@ -73,6 +73,31 @@ export function buildUploadConfig(env: EnvFn): UploadProviderConfig {
   // endpoint is present.
   const forcePathStyle = trim(env("S3_FORCE_PATH_STYLE", "")) === "false" ? false : Boolean(endpoint);
 
+  // ACL support is NOT universal across S3-compatible providers, and sending an
+  // unsupported ACL is not a no-op everywhere — it can fail the PutObject and
+  // take every upload down. Cloudflare R2 in particular has no per-object ACL
+  // model at all: public access there is bucket-level, granted by a custom
+  // domain or the r2.dev subdomain, never by `x-amz-acl`. So the ACL is applied
+  // only where it means something.
+  //
+  // Default: on for real AWS and MinIO (the providers that honour it), off for
+  // R2, detected by its endpoint host. `S3_ACL=none` forces it off anywhere;
+  // any other explicit value is used verbatim, so an operator can still say
+  // `S3_ACL=private` or match a provider-specific canned ACL without a code
+  // change.
+  const aclSetting = trim(env("S3_ACL", ""));
+  const isR2 = /\.r2\.cloudflarestorage\.com$/i.test(
+    endpoint.replace(/^https?:\/\//, "").replace(/\/.*$/, ""),
+  );
+  const acl = aclSetting
+    ? aclSetting.toLowerCase() === "none"
+      ? ""
+      : aclSetting
+    : isR2
+      ? ""
+      : "public-read";
+  const aclOption = acl ? { ACL: acl } : {};
+
   return {
     provider: "aws-s3",
     providerOptions: {
@@ -90,9 +115,11 @@ export function buildUploadConfig(env: EnvFn): UploadProviderConfig {
     },
     // Objects must be publicly readable: the theme-site and the customizer both
     // load these URLs directly from the browser, cross-origin, with no signing.
+    // On providers without an object ACL model (R2) this is empty and the
+    // bucket itself must grant public read — see the `acl` derivation above.
     actionOptions: {
-      upload: { ACL: "public-read" },
-      uploadStream: { ACL: "public-read" },
+      upload: { ...aclOption },
+      uploadStream: { ...aclOption },
       delete: {},
     },
   };

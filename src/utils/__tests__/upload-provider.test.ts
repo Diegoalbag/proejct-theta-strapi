@@ -79,6 +79,52 @@ describe("buildUploadConfig — engaging S3", () => {
     expect((c.actionOptions as any).uploadStream.ACL).toBe("public-read");
   });
 
+  it("omits the ACL entirely on Cloudflare R2, which has no object ACL model", () => {
+    // R2 grants public read at the BUCKET level (custom domain / r2.dev), never
+    // per object. Sending `x-amz-acl` there is not a harmless no-op — it can
+    // fail the PutObject outright and take every upload down, which looks
+    // identical to the CMS being broken.
+    const c = buildUploadConfig(
+      envFrom({
+        ...FULL,
+        S3_ENDPOINT: "https://abc123.r2.cloudflarestorage.com",
+      }),
+    );
+    expect((c.actionOptions as any).upload).toEqual({});
+    expect((c.actionOptions as any).uploadStream).toEqual({});
+  });
+
+  it("still sets public-read on a non-R2 custom endpoint such as MinIO", () => {
+    // The R2 carve-out must key on the provider, not merely on "an endpoint is
+    // set" — MinIO honours ACLs and needs them.
+    const c = buildUploadConfig(
+      envFrom({ ...FULL, S3_ENDPOINT: "https://minio.internal:9000" }),
+    );
+    expect((c.actionOptions as any).upload.ACL).toBe("public-read");
+  });
+
+  it("lets S3_ACL=none force the ACL off on any provider", () => {
+    const c = buildUploadConfig(envFrom({ ...FULL, S3_ACL: "none" }));
+    expect((c.actionOptions as any).upload).toEqual({});
+  });
+
+  it("passes any other explicit S3_ACL through verbatim", () => {
+    // Escape hatch: a provider-specific canned ACL must not require a code change.
+    const c = buildUploadConfig(envFrom({ ...FULL, S3_ACL: "private" }));
+    expect((c.actionOptions as any).upload.ACL).toBe("private");
+  });
+
+  it("lets an explicit S3_ACL override the R2 default", () => {
+    const c = buildUploadConfig(
+      envFrom({
+        ...FULL,
+        S3_ENDPOINT: "https://abc123.r2.cloudflarestorage.com",
+        S3_ACL: "public-read",
+      }),
+    );
+    expect((c.actionOptions as any).upload.ACL).toBe("public-read");
+  });
+
   it("defaults region to auto, which is what R2 and Railway buckets expect", () => {
     const c = buildUploadConfig(envFrom(FULL));
     expect((c.providerOptions as any).s3Options.region).toBe("auto");
