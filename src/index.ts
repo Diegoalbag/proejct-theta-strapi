@@ -120,6 +120,19 @@ const FORM_INGEST_TOKEN_NAME = 'form-ingest-token';
 const FORM_INGEST_PERMISSIONS = [
   'api::form-submission.form-submission.create',
   'plugin::upload.content-api.upload',
+  // Read on Form is REQUIRED to write a submission, which is not obvious.
+  // A FormSubmission carries a `form` relation, and Strapi's validateInput runs
+  // `throwRestrictedRelations(auth)` over the request BODY: a relation pointing
+  // at a content type the token cannot reach is rejected with
+  // `ValidationError: Invalid key form`. Without these two the ingest route's
+  // POST /api/form-submissions fails 400 for EVERY submission.
+  //
+  // This does not widen what is public. A tenant site already reads form
+  // definitions with `NEXT_PUBLIC_STRAPI_TOKEN`, which ships inside the public
+  // client bundle — form definitions are world-readable on a tenant site today.
+  // The token stays create-only for WRITES, which is the property that matters.
+  'api::form.form.find',
+  'api::form.form.findOne',
 ];
 
 /**
@@ -157,7 +170,30 @@ async function ensureFormIngestToken(strapi: Core.Strapi) {
 
   try {
     const existing = await strapi.service('admin::api-token').getByName(FORM_INGEST_TOKEN_NAME);
-    if (existing) return; // already minted and delivered
+    if (existing) {
+      // A token's permissions are fixed at CREATION, so a tenant minted before
+      // `api::form.form.*` was added above keeps a token that can never write a
+      // submission. Returning early here (what this used to do unconditionally)
+      // would strand every such tenant forever.
+      //
+      // Healed with `update` rather than revoke-and-recreate on purpose: update
+      // preserves the access key, so the copy the platform already holds stays
+      // valid — no second callback, no re-deploy of the tenant site, and no
+      // window where the site holds a revoked token. Every existing tenant
+      // repairs itself on its next boot.
+      const current: string[] = existing.permissions ?? [];
+      const missing = FORM_INGEST_PERMISSIONS.filter((p) => !current.includes(p));
+      if (missing.length === 0) return; // already minted, delivered and current
+
+      await strapi.service('admin::api-token').update(existing.id, {
+        permissions: FORM_INGEST_PERMISSIONS,
+      });
+      console.log(
+        '[bootstrap] Form-ingest token permissions healed, added:',
+        missing.join(', ')
+      );
+      return;
+    }
 
     console.log('[bootstrap] Minting form-ingest token...');
 
